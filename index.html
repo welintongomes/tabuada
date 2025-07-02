@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Tabuada</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: white;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tabuada-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .tabuada-selector label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .tabuada-selector select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+
+        .start-btn:hover,
+        .start-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .game-area {
+            display: none;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .option-btn.correct {
+            background: #2ecc71;
+            border-color: #27ae60;
+        }
+
+        .option-btn.wrong {
+            background: #e74c3c;
+            border-color: #c0392b;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #27ae60);
+            transition: width 0.3s;
+        }
+
+        .results {
+            display: none;
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .score-details {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .restart-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .history {
+            margin-top: 20px;
+        }
+
+        .history h3 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .timer {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .timer-circle {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            animation: spin 1s linear infinite;
+        }
+
+        .timer-circle span {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .question {
+                font-size: 1.5rem;
+                padding: 15px;
+            }
+
+            .option-btn {
+                padding: 15px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 Jogo de Tabuada</h1>
+        </div>
+
+        <div class="card tabuada-selector" id="selector">
+            <label for="tabuadaSelect">Escolha a tabuada:</label>
+            <select id="tabuadaSelect">
+                <option value="2">Tabuada do 2</option>
+                <option value="3">Tabuada do 3</option>
+                <option value="4">Tabuada do 4</option>
+                <option value="5">Tabuada do 5</option>
+                <option value="6">Tabuada do 6</option>
+                <option value="7">Tabuada do 7</option>
+                <option value="8">Tabuada do 8</option>
+                <option value="9">Tabuada do 9</option>
+            </select>
+            <label for="difficultySelect">Escolha a dificuldade:</label>
+            <select id="difficultySelect">
+                <option value="easy">Fácil (sem tempo)</option>
+                <option value="hard">Difícil (5 segundos)</option>
+                <option value="veryhard">Muito Difícil (2 segundos)</option>
+            </select>
+            <button class="start-btn" onclick="startGame()">Começar Jogo!</button>
+        </div>
+        <div class="card history" id="history">
+            <h3>📊 Histórico de Resultados</h3>
+            <div id="historyList"></div>
+        </div>
+        <div class="timer" id="timerContainer" style="display: none;">
+                <div class="timer-circle">
+                    <span id="timerText">5</span>
+                </div>
+            </div>
+        <div class="card game-area" id="gameArea">
+            <div class="progress">
+                <span id="currentQ">1</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span id="totalQ">8</span>
+            </div>
+
+            <div class="question" id="question"></div>
+
+            <div class="options" id="options"></div>
+        </div>
+
+        <div class="card results" id="results">
+            <div class="score-display" id="scoreDisplay"></div>
+            <div class="score-details" id="scoreDetails"></div>
+            <button class="restart-btn" onclick="backToMenu()">Jogar Novamente</button>
+        </div>
+
+
+    </div>
+
+    <script>
+        let currentTabuada = 2;
+        let currentQuestion = 0;
+        let score = 0;
+        let totalQuestions = 8;
+        let questions = [];
+        let gameStartTime;
+        let difficulty = 'easy';
+        let timeLimit = 0;
+        let currentTimer = null;
+        let timeLeft = 0;
+
+        // Inicializar IndexedDB
+        let db;
+        const request = indexedDB.open('TabuadaGame', 1);
+
+        request.onerror = function (event) {
+            console.log('Erro ao abrir IndexedDB');
+        };
+
+        request.onsuccess = function (event) {
+            db = event.target.result;
+            loadHistory();
+        };
+
+        request.onupgradeneeded = function (event) {
+            db = event.target.result;
+            const objectStore = db.createObjectStore('results', { keyPath: 'id', autoIncrement: true });
+            objectStore.createIndex('tabuada', 'tabuada', { unique: false });
+            objectStore.createIndex('date', 'date', { unique: false });
+        };
+
+        function startGame() {
+            currentTabuada = parseInt(document.getElementById('tabuadaSelect').value);
+            difficulty = document.getElementById('difficultySelect').value;
+            timeLimit = difficulty === 'easy' ? 0 : (difficulty === 'hard' ? 5 : 2);
+            currentQuestion = 0;
+            score = 0;
+            gameStartTime = new Date();
+
+            generateQuestions();
+
+            document.getElementById('selector').style.display = 'none';
+            document.getElementById('history').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            showQuestion();
+        }
+
+        function generateQuestions() {
+            questions = [];
+
+            // Gerar todas as multiplicações da tabuada
+            for (let i = 2; i <= 9; i++) {
+                const answer = currentTabuada * i;
+                const wrongAnswers = generateWrongAnswers(answer);
+
+                questions.push({
+                    question: `${currentTabuada} × ${i}`,
+                    correctAnswer: answer,
+                    options: shuffleArray([answer, ...wrongAnswers])
+                });
+            }
+
+            questions = shuffleArray(questions);
+        }
+
+        function generateWrongAnswers(correctAnswer) {
+            const wrong = [];
+            const used = new Set([correctAnswer]);
+
+            while (wrong.length < 3) {
+                let wrongAnswer;
+
+                // Gerar respostas próximas para confundir
+                const methods = [
+                    () => correctAnswer + Math.floor(Math.random() * 10) + 1,
+                    () => correctAnswer - Math.floor(Math.random() * 10) - 1,
+                    () => correctAnswer + currentTabuada,
+                    () => correctAnswer - currentTabuada,
+                    () => Math.floor(correctAnswer * (0.8 + Math.random() * 0.4))
+                ];
+
+                wrongAnswer = methods[Math.floor(Math.random() * methods.length)]();
+
+                if (wrongAnswer > 0 && !used.has(wrongAnswer)) {
+                    wrong.push(wrongAnswer);
+                    used.add(wrongAnswer);
+                }
+            }
+
+            return wrong;
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        function startTimer() {
+            timeLeft = timeLimit;
+            document.getElementById('timerText').textContent = timeLeft;
+
+            if (currentTimer) {
+                clearInterval(currentTimer);
+            }
+
+            currentTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timerText').textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(currentTimer);
+                    timeOut();
+                }
+            }, 1000);
+        }
+
+        function timeOut() {
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+            // Destacar resposta correta
+            const q = questions[currentQuestion];
+            allBtns.forEach(b => {
+                if (parseInt(b.textContent) === q.correctAnswer) {
+                    b.classList.add('correct');
+                }
+            });
+
+            setTimeout(() => {
+                currentQuestion++;
+                showQuestion();
+            }, 1500);
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= totalQuestions) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentQuestion];
+            document.getElementById('question').textContent = q.question + ' = ?';
+            document.getElementById('currentQ').textContent = currentQuestion + 1;
+
+            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            // Configurar timer
+            if (timeLimit > 0) {
+                document.getElementById('timerContainer').style.display = 'block';
+                startTimer();
+            } else {
+                document.getElementById('timerContainer').style.display = 'none';
+            }
+            q.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectAnswer(option, q.correctAnswer, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selected, correct, btn) {
+            const allBtns = document.querySelectorAll('.option-btn');
+            if (currentTimer) {
+                clearInterval(currentTimer);
+            }
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score++;
+            } else {
+                btn.classList.add('wrong');
+                // Destacar resposta correta
+                allBtns.forEach(b => {
+                    if (parseInt(b.textContent) === correct) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                showQuestion();
+            }, 1500);
+        }
+
+        function endGame() {
+            const gameEndTime = new Date();
+            const timeTaken = Math.round((gameEndTime - gameStartTime) / 1000);
+            const percentage = Math.round((score / totalQuestions) * 100);
+
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('timerContainer').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+
+            document.getElementById('scoreDisplay').textContent = `${score}/${totalQuestions}`;
+            document.getElementById('scoreDetails').innerHTML = `
+                Acertos: ${percentage}%<br>
+                Tempo: ${timeTaken}s<br>
+                Tabuada do ${currentTabuada}
+            `;
+
+            // Salvar resultado no IndexedDB
+            saveResult({
+                tabuada: currentTabuada,
+                score: score,
+                total: totalQuestions,
+                percentage: percentage,
+                time: timeTaken,
+                date: new Date().toLocaleDateString('pt-BR')
+            });
+        }
+
+        function saveResult(result) {
+            if (!db) return;
+
+            const transaction = db.transaction(['results'], 'readwrite');
+            const objectStore = transaction.objectStore('results');
+            objectStore.add(result);
+
+            transaction.oncomplete = function () {
+                loadHistory();
+            };
+        }
+
+        function loadHistory() {
+            if (!db) return;
+
+            const transaction = db.transaction(['results'], 'readonly');
+            const objectStore = transaction.objectStore('results');
+            const request = objectStore.getAll();
+
+            request.onsuccess = function () {
+                const results = request.result.slice(-5).reverse(); // Últimos 10 resultados
+                displayHistory(results);
+            };
+        }
+
+        function displayHistory(results) {
+            const historyList = document.getElementById('historyList');
+
+            if (results.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; opacity: 0.7;">Nenhum resultado ainda</p>';
+                return;
+            }
+
+            historyList.innerHTML = results.map(result => `
+                <div class="history-item">
+                    <span>Tabuada ${result.tabuada}</span>
+                    <span>${result.score}/${result.total} (${result.percentage}%)</span>
+                    <span>${result.date}</span>
+                </div>
+            `).join('');
+        }
+
+        function backToMenu() {
+            document.getElementById('selector').style.display = 'block';
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('timerContainer').style.display = 'none';
+            document.getElementById('history').style.display = 'block';
+        }
+
+        // Carregar histórico ao iniciar
+        window.onload = function () {
+            setTimeout(loadHistory, 1000);
+        };
+    </script>
+</body>
+
+</html>
