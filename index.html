@@ -566,7 +566,7 @@
             const request = objectStore.getAll();
 
             request.onsuccess = function () {
-                const results = request.result.slice(-5).reverse(); // Últimos 10 resultados
+                const results = request.result.slice(-8).reverse(); // Últimos 10 resultados
                 displayHistory(results);
             };
         }
